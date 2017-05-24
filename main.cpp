@@ -120,7 +120,7 @@ int main(int argc, char** argv) {
     srand(time(0));
 
     int mcsteps = argc > 2 ? stoi(argv[1]) : 50000;
-    int temp    = argc > 2 ? stoi(argv[2]) : 1;
+    int temp    = argc > 2 ? stod(argv[2]) : 1;
 //    cout << mcsteps << ", " << temp << endl;
     new Model(mcsteps, temp);
 //    lineto(100,200);
