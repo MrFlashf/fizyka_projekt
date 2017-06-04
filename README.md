@@ -8,4 +8,4 @@ Instruction:
  
  Need -std=gnu++11 flag to compile
  
- Program will output .txt file for named wykres_{temperature}.txt which contains magnetic field statuses (?) counted per 10 MC steps
+ Program will output .txt file named wykres_{temperature}.txt which contains magnetic field statuses (?) counted per 10 MC steps
