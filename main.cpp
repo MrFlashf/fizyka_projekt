@@ -1,16 +1,11 @@
 #include <iostream>
+#include <fstream>
 #include <random>
-//#include <stdlib.h>
-//#include <time.h>
-//#include <cstdlib>
 #include <tgmath.h>
-#include<graphics.h>
+#include <algorithm>
 
 using namespace std;
-const int SIZE          = 50;
-const int START_X       = 20;
-const int START_Y       = 20;
-const int PIXEL_SIZE    = 5;
+const int SIZE = 50;
 
 void randomizeArray(double array[SIZE][SIZE]) {
     for (int i = 0; i < SIZE; i++) {
@@ -29,8 +24,7 @@ private:
     double temperature;
 public:
     Model(int steps, double temperature) {
-        srand(time(0));
-        this->steps = steps;
+        this->steps       = steps;
         this->temperature = temperature;
         randomizeArray(array);
         run();
@@ -42,40 +36,24 @@ public:
 
     void touch(int x,int y) {
 
-        double neighbours[4] = {
-            array[y][x + 1 == SIZE ? 0 : x + 1], //right
-            array[y + 1 == SIZE ? 0 : y + 1][x], //bottom
-            array[y][x - 1 == -1 ? SIZE-1 : x - 1],//left
-            array[y - 1 == -1 ? SIZE-1 : y - 1][x] //top
-        };
+        double neighboursSum = 0;
+
+        neighboursSum +=
+                  array[y][x + 1 == SIZE ? 0 : x + 1] //right
+                + array[y + 1 == SIZE ? 0 : y + 1][x] //bottom
+                + array[y][x - 1 == -1 ? SIZE-1 : x - 1]//left
+                + array[y - 1 == -1 ? SIZE-1 : y - 1][x]; //top
 
         double state = array[y][x];
-
-        double neighboursSum = 0;
-        for (int i = 0; i < 4; i++) {
-            neighboursSum += neighbours[i];
-        }
 
         double ek = state * neighboursSum;
         double ep = -1 * ek;
 
         double deltaE   = ek - ep;
-        double t        = -1 * (deltaE / temperature);
-        double exp1     = exp(t);
         double r        = ((double)rand() / (double)RAND_MAX);
 
-        if ((deltaE <= 0) || r <= exp1) {
+        if ((deltaE <= 0) || r <= exp(-1 * (deltaE / temperature))) {
             invert(x,y);
-        }
-    }
-
-    void draw() {
-        int start = 100;
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                array[i][j] == -1 ? setcolor(15) : setcolor(3);
-                bar(START_X+j*PIXEL_SIZE,START_Y+i*PIXEL_SIZE,START_X+(j+1)*PIXEL_SIZE,START_Y+(i+1)*PIXEL_SIZE);
-            }
         }
     }
 
@@ -87,7 +65,7 @@ public:
         }
     }
 
-    bool sum() {
+    double sum() {
         double m = 0.0;
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
@@ -96,41 +74,38 @@ public:
         }
         m = m / (SIZE*SIZE);
         m < 0 ? m = -1*m : m;
-        cout << m << endl;
-        return m == 1;
+        return m;
     }
 
     void run() {
+        ofstream file;
+        string fileName = "./wykres_"+to_string(temperature)+".txt";
+        file.open(fileName);
+
         for (int i = 0; i < steps; i++) {
             mcStep();
             stepsDone++;
-            if (i % 100==0)
-                draw();
-            if (sum()) {
+            double summ = sum();
+            if (i % 10 == 0) {
+                string sumString = to_string(summ);
+                replace(sumString.begin(), sumString.end(), '.', ',');
+                file << sumString << endl;
+            }
+            if (summ == 1.0) {
                 cout << stepsDone;
+                file << summ << endl;
                 return;
             }
         }
+        file.close();
     }
 };
 
 int main(int argc, char** argv) {
-    int gd = DETECT,gm;
-    initgraph(&gd,&gm,NULL);
     srand(time(0));
 
     int mcsteps = argc > 2 ? stoi(argv[1]) : 50000;
-    int temp    = argc > 2 ? stod(argv[2]) : 1;
-//    cout << mcsteps << ", " << temp << endl;
+    double temp = argc > 2 ? stod(argv[2]) : 1;
     new Model(mcsteps, temp);
-//    lineto(100,200);
-//    new Model(1, 1);
-//    delay(5000);
-//    closegraph();
     return 0;
-//g++ -o program main.cpp -lgraph -std=gnu++11
-
 }
-
-
-
