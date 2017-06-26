@@ -91,11 +91,11 @@ public:
                 replace(sumString.begin(), sumString.end(), '.', ',');
                 file << sumString << endl;
             }
-            if (summ == 1.0) {
-                cout << stepsDone;
-                file << summ << endl;
-                return;
-            }
+//            if (summ == 1.0) {
+//                cout << stepsDone;
+//                file << summ << endl;
+//                return;
+//            }
         }
         file.close();
     }
